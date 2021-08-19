@@ -23,6 +23,8 @@
 #include <string>
 #include <filesystem>
 #include <sstream>
+#include <vector>
+
 
 using namespace std::chrono_literals;
 
@@ -40,18 +42,17 @@ namespace FileDialog {
 
 	static bool fileDialogOpen = false;
 
-	void ShowFileDialog(bool* open, char* buffer, unsigned int bufferSize, FileDialogType type = FileDialogType::OpenFile) {
+	void ShowFileDialog(bool* open, std::filesystem::path& buffer, FileDialogType type = FileDialogType::OpenFile) {
 		static int fileDialogFileSelectIndex = 0;
 		static int fileDialogFolderSelectIndex = 0;
-		static std::string fileDialogCurrentPath = "C:\\dev\\";
-		static std::string fileDialogCurrentFile = "";
-		static std::string fileDialogCurrentFolder = "";
-		static char fileDialogError[500] = "";
+		static std::filesystem::path fileDialogCurrentPath = std::filesystem::current_path();
+		static std::filesystem::path fileDialogCurrentFile;
+		static std::filesystem::path fileDialogCurrentFolder;
+		static std::string fileDialogError = "";
 		static FileDialogSortOrder fileNameSortOrder = FileDialogSortOrder::None;
 		static FileDialogSortOrder sizeSortOrder = FileDialogSortOrder::None;
 		static FileDialogSortOrder dateSortOrder = FileDialogSortOrder::None;
 		static FileDialogSortOrder typeSortOrder = FileDialogSortOrder::None;
-
 
 		if (open) {
 			ImGui::SetNextWindowSize(ImVec2(740.0f, 410.0f));
@@ -211,7 +212,7 @@ namespace FileDialog {
 			}
 			ImGui::EndChild();
 
-			std::string selectedFilePath = fileDialogCurrentPath + (fileDialogCurrentPath.back() == '\\' ? "" : "\\") + (fileDialogCurrentFolder.size() > 0 ? fileDialogCurrentFolder : fileDialogCurrentFile);
+			std::string selectedFilePath = fileDialogCurrentPath.generic_string();
 			char* buf = &selectedFilePath[0];
 			ImGui::PushItemWidth(724);
 			ImGui::InputText("", buf, sizeof(buf), ImGuiInputTextFlags_ReadOnly);
@@ -249,7 +250,7 @@ namespace FileDialog {
 						strcpy_s(newFolderError, "Folder name can't be empty");
 					}
 					else {
-						std::string newFilePath = fileDialogCurrentPath + (fileDialogCurrentPath.back() == '\\' ? "" : "\\") + newFolderName;
+						auto newFilePath = fileDialogCurrentPath / newFolderName;
 						std::filesystem::create_directory(newFilePath);
 						ImGui::CloseCurrentPopup();
 					}
@@ -268,10 +269,10 @@ namespace FileDialog {
 			if (ImGui::BeginPopup("DeleteFolderPopup", ImGuiWindowFlags_Modal)) {
 				ImGui::TextColored(ImColor(1.0f, 0.0f, 0.2f, 1.0f), "Are you sure you want to delete this folder?");
 				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 6);
-				ImGui::TextUnformatted(fileDialogCurrentFolder.c_str());
+				ImGui::TextUnformatted(fileDialogCurrentFolder.generic_string().c_str());
 				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 6);
 				if (ImGui::Button("Yes")) {
-					std::filesystem::remove(fileDialogCurrentPath + (fileDialogCurrentPath.back() == '\\' ? "" : "\\") + fileDialogCurrentFolder);
+					std::filesystem::remove(fileDialogCurrentPath/fileDialogCurrentFolder);
 					ImGui::CloseCurrentPopup();
 				}
 				ImGui::SameLine();
@@ -293,25 +294,41 @@ namespace FileDialog {
 			if (ImGui::Button("Choose")) {
 				if (type == FileDialogType::SelectFolder) {
 					if (fileDialogCurrentFolder == "") {
-						strcpy_s(fileDialogError, "Error: You must select a folder!");
+						fileDialogError="Error: You must select a folder!";
 					}
 					else {
-						strcpy(buffer, (fileDialogCurrentPath + (fileDialogCurrentPath.back() == '\\' ? "" : "\\") + fileDialogCurrentFolder).c_str());
+						buffer=fileDialogCurrentPath/ fileDialogCurrentFolder;
 						fileDialogFileSelectIndex = 0;
 						fileDialogFolderSelectIndex = 0;
 						fileDialogCurrentFile = "";
 						fileDialogOpen = false;
 					}
 				}
+				else {
+					if (fileDialogCurrentFile.empty()) {
+						fileDialogError="Error: You must select a file!";
+					}
+					else {
+						buffer = fileDialogCurrentPath/fileDialogCurrentFile ;
+						fileDialogOpen = false;
+						fileDialogFileSelectIndex = 0;
+						fileDialogFolderSelectIndex = 0;
+						fileDialogCurrentFile = "";
+					}
+				}
 			}
 
-			if (strlen(fileDialogError) > 0) {
-				ImGui::TextColored(ImColor(1.0f, 0.0f, 0.2f, 1.0f), fileDialogError);
+			if (fileDialogError.size() > 0) {
+				ImGui::TextColored(ImColor(1.0f, 0.0f, 0.2f, 1.0f), &fileDialogError[0]);
 			}
-
 			ImGui::End();
 		}
 	}
 
+	void ShowFileDialog(bool* open, std::string& buffer, FileDialogType type = FileDialogType::OpenFile) {
+		std::filesystem::path path;
+		ShowFileDialog(open, path, type);
+		buffer=path.generic_string();
+	}
 }
 
