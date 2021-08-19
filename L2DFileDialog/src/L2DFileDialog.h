@@ -41,8 +41,24 @@ namespace FileDialog {
 	};
 
 	static bool fileDialogOpen = false;
+	//forward declarations
+	void ShowFileDialog(bool* open, std::filesystem::path& buffer, FileDialogType type = FileDialogType::OpenFile);
+	void ShowFileDialog(bool* open, std::string& buffer, FileDialogType type = FileDialogType::OpenFile);
 
-	void ShowFileDialog(bool* open, std::filesystem::path& buffer, FileDialogType type = FileDialogType::OpenFile) {
+	//backwards compatibility
+	void ShowFileDialog(bool* open, char* buffer, unsigned int bufferSize, FileDialogType type = FileDialogType::OpenFile) {
+		std::filesystem::path path;
+		ShowFileDialog(open, path, type);
+
+		int path_length = path.generic_string().size();
+		auto wstr = path.generic_string();
+		if (path_length < bufferSize)
+			std::memcpy(buffer, &wstr[0], sizeof(wchar_t)*path_length + 1);
+
+	}
+
+
+	void ShowFileDialog(bool* open, std::filesystem::path& buffer, FileDialogType type) {
 		static int fileDialogFileSelectIndex = 0;
 		static int fileDialogFolderSelectIndex = 0;
 		static std::filesystem::path fileDialogCurrentPath = std::filesystem::current_path();
@@ -325,7 +341,7 @@ namespace FileDialog {
 		}
 	}
 
-	void ShowFileDialog(bool* open, std::string& buffer, FileDialogType type = FileDialogType::OpenFile) {
+	void ShowFileDialog(bool* open, std::string& buffer, FileDialogType type) {
 		std::filesystem::path path;
 		ShowFileDialog(open, path, type);
 		buffer=path.generic_string();
