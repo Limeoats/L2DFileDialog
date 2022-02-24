@@ -43,7 +43,7 @@ namespace FileDialog {
 	void ShowFileDialog(bool* open, char* buffer, unsigned int bufferSize, FileDialogType type = FileDialogType::OpenFile) {
 		static int fileDialogFileSelectIndex = 0;
 		static int fileDialogFolderSelectIndex = 0;
-		static std::string fileDialogCurrentPath = "C:\\dev\\";
+		static std::string fileDialogCurrentPath = std::filesystem::current_path().string();
 		static std::string fileDialogCurrentFile = "";
 		static std::string fileDialogCurrentFolder = "";
 		static char fileDialogError[500] = "";
