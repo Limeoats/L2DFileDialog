@@ -1,3 +1,19 @@
+/*
+	Copyright 2020 Limeoats
+
+   	Licensed under the Apache License, Version 2.0 (the "License");
+   	you may not use this file except in compliance with the License.
+   	You may obtain a copy of the License at
+	
+       	http://www.apache.org/licenses/LICENSE-2.0
+	
+   	Unless required by applicable law or agreed to in writing, software
+   	distributed under the License is distributed on an "AS IS" BASIS,
+   	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   	See the License for the specific language governing permissions and
+   	limitations under the License.
+*/
+
 #pragma once
 
 
@@ -59,7 +75,7 @@ namespace FileDialog {
 
 			ImGui::BeginChild("Directories##1", ImVec2(200, 300), true, ImGuiWindowFlags_HorizontalScrollbar);
 
-			if (ImGui::Selectable("..", false, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(ImGui::GetWindowContentRegionWidth(), 0))) {
+			if (ImGui::Selectable("..", false, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
 				if (ImGui::IsMouseDoubleClicked(0)) {
 					fileDialogCurrentPath = std::filesystem::path(fileDialogCurrentPath).parent_path().string();
 				}
@@ -198,7 +214,7 @@ namespace FileDialog {
 			std::string selectedFilePath = fileDialogCurrentPath + (fileDialogCurrentPath.back() == '\\' ? "" : "\\") + (fileDialogCurrentFolder.size() > 0 ? fileDialogCurrentFolder : fileDialogCurrentFile);
 			char* buf = &selectedFilePath[0];
 			ImGui::PushItemWidth(724);
-			ImGui::InputText("", buf, sizeof(buf), ImGuiInputTextFlags_ReadOnly);
+			ImGui::InputText("##text", buf, sizeof(buf), ImGuiInputTextFlags_ReadOnly);
 
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 6);
 
