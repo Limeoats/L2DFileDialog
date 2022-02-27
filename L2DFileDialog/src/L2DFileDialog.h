@@ -38,19 +38,19 @@ namespace FileDialog {
 		None
 	};
 
-	static bool fileDialogOpen = false;
+	static bool file_dialog_open = false;
 
-	void ShowFileDialog(bool* open, char* buffer, unsigned int bufferSize, FileDialogType type = FileDialogType::OpenFile) {
-		static int fileDialogFileSelectIndex = 0;
-		static int fileDialogFolderSelectIndex = 0;
-		static std::string fileDialogCurrentPath = std::filesystem::current_path().string();
-		static std::string fileDialogCurrentFile = "";
-		static std::string fileDialogCurrentFolder = "";
-		static char fileDialogError[500] = "";
-		static FileDialogSortOrder fileNameSortOrder = FileDialogSortOrder::None;
-		static FileDialogSortOrder sizeSortOrder = FileDialogSortOrder::None;
-		static FileDialogSortOrder dateSortOrder = FileDialogSortOrder::None;
-		static FileDialogSortOrder typeSortOrder = FileDialogSortOrder::None;
+	void ShowFileDialog(bool* open, char* buffer, unsigned int buffer_size, FileDialogType type = FileDialogType::OpenFile) {
+		static int file_dialog_file_select_index = 0;
+		static int file_dialog_folder_select_index = 0;
+		static std::string file_dialog_current_path = std::filesystem::current_path().string();
+		static std::string file_dialog_current_file = "";
+		static std::string file_dialog_current_folder = "";
+		static char file_dialog_error[500] = "";
+		static FileDialogSortOrder file_name_sort_order = FileDialogSortOrder::None;
+		static FileDialogSortOrder size_sort_order = FileDialogSortOrder::None;
+		static FileDialogSortOrder date_sort_order = FileDialogSortOrder::None;
+		static FileDialogSortOrder type_sort_order = FileDialogSortOrder::None;
 
 
 		if (open) {
@@ -60,7 +60,7 @@ namespace FileDialog {
 			std::vector<std::filesystem::directory_entry> files;
 			std::vector<std::filesystem::directory_entry> folders;
 			try {
-				for (auto& p : std::filesystem::directory_iterator(fileDialogCurrentPath)) {
+				for (auto& p : std::filesystem::directory_iterator(file_dialog_current_path)) {
 					if (p.is_directory()) {
 						folders.push_back(p);
 					}
@@ -71,28 +71,28 @@ namespace FileDialog {
 			}
 			catch (...) {}
 
-			ImGui::Text("%s", fileDialogCurrentPath.c_str());
+			ImGui::Text("%s", file_dialog_current_path.c_str());
 
 			ImGui::BeginChild("Directories##1", ImVec2(200, 300), true, ImGuiWindowFlags_HorizontalScrollbar);
 
 			if (ImGui::Selectable("..", false, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
 				if (ImGui::IsMouseDoubleClicked(0)) {
-					fileDialogCurrentPath = std::filesystem::path(fileDialogCurrentPath).parent_path().string();
+					file_dialog_current_path = std::filesystem::path(file_dialog_current_path).parent_path().string();
 				}
 			}
 			for (int i = 0; i < folders.size(); ++i) {
-				if (ImGui::Selectable(folders[i].path().stem().string().c_str(), i == fileDialogFolderSelectIndex, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(ImGui::GetWindowContentRegionWidth(), 0))) {
-					fileDialogCurrentFile = "";
+				if (ImGui::Selectable(folders[i].path().stem().string().c_str(), i == file_dialog_folder_select_index, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(ImGui::GetWindowContentRegionWidth(), 0))) {
+					file_dialog_current_file = "";
 					if (ImGui::IsMouseDoubleClicked(0)) {
-						fileDialogCurrentPath = folders[i].path().string();
-						fileDialogFolderSelectIndex = 0;
-						fileDialogFileSelectIndex = 0;
+						file_dialog_current_path = folders[i].path().string();
+						file_dialog_folder_select_index = 0;
+						file_dialog_file_select_index = 0;
 						ImGui::SetScrollHereY(0.0f);
-						fileDialogCurrentFolder = "";
+						file_dialog_current_folder = "";
 					}
 					else {
-						fileDialogFolderSelectIndex = i;
-						fileDialogCurrentFolder = folders[i].path().stem().string();
+						file_dialog_folder_select_index = i;
+						file_dialog_current_folder = folders[i].path().stem().string();
 					}
 				}
 			}
@@ -102,55 +102,55 @@ namespace FileDialog {
 
 			ImGui::BeginChild("Files##1", ImVec2(516, 300), true, ImGuiWindowFlags_HorizontalScrollbar);
 			ImGui::Columns(4);
-			static float initialSpacingColumn0 = 230.0f;
-			if (initialSpacingColumn0 > 0) {
-				ImGui::SetColumnWidth(0, initialSpacingColumn0);
-				initialSpacingColumn0 = 0.0f;
+			static float initial_spacing_column_0 = 230.0f;
+			if (initial_spacing_column_0 > 0) {
+				ImGui::SetColumnWidth(0, initial_spacing_column_0);
+				initial_spacing_column_0 = 0.0f;
 			}
-			static float initialSpacingColumn1 = 80.0f;
-			if (initialSpacingColumn1 > 0) {
-				ImGui::SetColumnWidth(1, initialSpacingColumn1);
-				initialSpacingColumn1 = 0.0f;
+			static float initial_spacing_column_1 = 80.0f;
+			if (initial_spacing_column_1 > 0) {
+				ImGui::SetColumnWidth(1, initial_spacing_column_1);
+				initial_spacing_column_1 = 0.0f;
 			}
-			static float initialSpacingColumn2 = 80.0f;
-			if (initialSpacingColumn2 > 0) {
-				ImGui::SetColumnWidth(2, initialSpacingColumn2);
-				initialSpacingColumn2 = 0.0f;
+			static float initial_spacing_column_2 = 80.0f;
+			if (initial_spacing_column_2 > 0) {
+				ImGui::SetColumnWidth(2, initial_spacing_column_2);
+				initial_spacing_column_2 = 0.0f;
 			}
 			if (ImGui::Selectable("File")) {
-				sizeSortOrder = FileDialogSortOrder::None;
-				dateSortOrder = FileDialogSortOrder::None;
-				typeSortOrder = FileDialogSortOrder::None;
-				fileNameSortOrder = (fileNameSortOrder == FileDialogSortOrder::Down ? FileDialogSortOrder::Up : FileDialogSortOrder::Down);
+				size_sort_order = FileDialogSortOrder::None;
+				date_sort_order = FileDialogSortOrder::None;
+				type_sort_order = FileDialogSortOrder::None;
+				file_name_sort_order = (file_name_sort_order == FileDialogSortOrder::Down ? FileDialogSortOrder::Up : FileDialogSortOrder::Down);
 			}
 			ImGui::NextColumn();
 			if (ImGui::Selectable("Size")) {
-				fileNameSortOrder = FileDialogSortOrder::None;
-				dateSortOrder = FileDialogSortOrder::None;
-				typeSortOrder = FileDialogSortOrder::None;
-				sizeSortOrder = (sizeSortOrder == FileDialogSortOrder::Down ? FileDialogSortOrder::Up : FileDialogSortOrder::Down);
+				file_name_sort_order = FileDialogSortOrder::None;
+				date_sort_order = FileDialogSortOrder::None;
+				type_sort_order = FileDialogSortOrder::None;
+				size_sort_order = (size_sort_order == FileDialogSortOrder::Down ? FileDialogSortOrder::Up : FileDialogSortOrder::Down);
 			}
 			ImGui::NextColumn();
 			if (ImGui::Selectable("Type")) {
-				fileNameSortOrder = FileDialogSortOrder::None;
-				dateSortOrder = FileDialogSortOrder::None;
-				sizeSortOrder = FileDialogSortOrder::None;
-				typeSortOrder = (typeSortOrder == FileDialogSortOrder::Down ? FileDialogSortOrder::Up : FileDialogSortOrder::Down);
+				file_name_sort_order = FileDialogSortOrder::None;
+				date_sort_order = FileDialogSortOrder::None;
+				size_sort_order = FileDialogSortOrder::None;
+				type_sort_order = (type_sort_order == FileDialogSortOrder::Down ? FileDialogSortOrder::Up : FileDialogSortOrder::Down);
 			}
 			ImGui::NextColumn();
 			if (ImGui::Selectable("Date")) {
-				fileNameSortOrder = FileDialogSortOrder::None;
-				sizeSortOrder = FileDialogSortOrder::None;
-				typeSortOrder = FileDialogSortOrder::None;
-				dateSortOrder = (dateSortOrder == FileDialogSortOrder::Down ? FileDialogSortOrder::Up : FileDialogSortOrder::Down);
+				file_name_sort_order = FileDialogSortOrder::None;
+				size_sort_order = FileDialogSortOrder::None;
+				type_sort_order = FileDialogSortOrder::None;
+				date_sort_order = (date_sort_order == FileDialogSortOrder::Down ? FileDialogSortOrder::Up : FileDialogSortOrder::Down);
 			}
 			ImGui::NextColumn();
 			ImGui::Separator();
 
 			// Sort files
-			if (fileNameSortOrder != FileDialogSortOrder::None) {
+			if (file_name_sort_order != FileDialogSortOrder::None) {
 				std::sort(files.begin(), files.end(), [](const std::filesystem::directory_entry& a, const std::filesystem::directory_entry& b) {
-					if (fileNameSortOrder == FileDialogSortOrder::Down) {
+					if (file_name_sort_order == FileDialogSortOrder::Down) {
 						return a.path().filename().string() > b.path().filename().string();
 					}
 					else {
@@ -158,9 +158,9 @@ namespace FileDialog {
 					}
 					});
 			}
-			else if (sizeSortOrder != FileDialogSortOrder::None) {
+			else if (size_sort_order != FileDialogSortOrder::None) {
 				std::sort(files.begin(), files.end(), [](const std::filesystem::directory_entry& a, const std::filesystem::directory_entry& b) {
-					if (sizeSortOrder == FileDialogSortOrder::Down) {
+					if (size_sort_order == FileDialogSortOrder::Down) {
 						return a.file_size() > b.file_size();
 					}
 					else {
@@ -168,9 +168,9 @@ namespace FileDialog {
 					}
 					});
 			}
-			else if (typeSortOrder != FileDialogSortOrder::None) {
+			else if (type_sort_order != FileDialogSortOrder::None) {
 				std::sort(files.begin(), files.end(), [](const std::filesystem::directory_entry& a, const std::filesystem::directory_entry& b) {
-					if (typeSortOrder == FileDialogSortOrder::Down) {
+					if (type_sort_order == FileDialogSortOrder::Down) {
 						return a.path().extension().string() > b.path().extension().string();
 					}
 					else {
@@ -178,9 +178,9 @@ namespace FileDialog {
 					}
 					});
 			}
-			else if (dateSortOrder != FileDialogSortOrder::None) {
+			else if (date_sort_order != FileDialogSortOrder::None) {
 				std::sort(files.begin(), files.end(), [](const std::filesystem::directory_entry& a, const std::filesystem::directory_entry& b) {
-					if (dateSortOrder == FileDialogSortOrder::Down) {
+					if (date_sort_order == FileDialogSortOrder::Down) {
 						return a.last_write_time() > b.last_write_time();
 					}
 					else {
@@ -190,10 +190,10 @@ namespace FileDialog {
 			}
 
 			for (int i = 0; i < files.size(); ++i) {
-				if (ImGui::Selectable(files[i].path().filename().string().c_str(), i == fileDialogFileSelectIndex, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(ImGui::GetWindowContentRegionWidth(), 0))) {
-					fileDialogFileSelectIndex = i;
-					fileDialogCurrentFile = files[i].path().filename().string();
-					fileDialogCurrentFolder = "";
+				if (ImGui::Selectable(files[i].path().filename().string().c_str(), i == file_dialog_file_select_index, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(ImGui::GetWindowContentRegionWidth(), 0))) {
+					file_dialog_file_select_index = i;
+					file_dialog_current_file = files[i].path().filename().string();
+					file_dialog_current_folder = "";
 				}
 				ImGui::NextColumn();
 				ImGui::TextUnformatted(std::to_string(files[i].file_size()).c_str());
@@ -211,8 +211,8 @@ namespace FileDialog {
 			}
 			ImGui::EndChild();
 
-			std::string selectedFilePath = fileDialogCurrentPath + (fileDialogCurrentPath.back() == '\\' ? "" : "\\") + (fileDialogCurrentFolder.size() > 0 ? fileDialogCurrentFolder : fileDialogCurrentFile);
-			char* buf = &selectedFilePath[0];
+			std::string selected_file_path = file_dialog_current_path + (file_dialog_current_path.back() == '\\' ? "" : "\\") + (file_dialog_current_folder.size() > 0 ? file_dialog_current_folder : file_dialog_current_file);
+			char* buf = &selected_file_path[0];
 			ImGui::PushItemWidth(724);
 			ImGui::InputText("##text", buf, sizeof(buf), ImGuiInputTextFlags_ReadOnly);
 
@@ -223,16 +223,16 @@ namespace FileDialog {
 			}
 			ImGui::SameLine();
 
-			static bool disableDeleteButton = false;
-			disableDeleteButton = (fileDialogCurrentFolder == "");
-			if (disableDeleteButton) {
+			static bool disable_delete_button = false;
+			disable_delete_button = (file_dialog_current_folder == "");
+			if (disable_delete_button) {
 				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 			}
 			if (ImGui::Button("Delete folder")) {
 				ImGui::OpenPopup("DeleteFolderPopup");
 			}
-			if (disableDeleteButton) {
+			if (disable_delete_button) {
 				ImGui::PopStyleVar();
 				ImGui::PopItemFlag();
 			}
@@ -241,26 +241,26 @@ namespace FileDialog {
 			ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 			if (ImGui::BeginPopup("NewFolderPopup", ImGuiWindowFlags_Modal)) {
 				ImGui::Text("Enter a name for the new folder");
-				static char newFolderName[500] = "";
-				static char newFolderError[500] = "";
-				ImGui::InputText("##newfolder", newFolderName, sizeof(newFolderName));
+				static char new_folder_name[500] = "";
+				static char new_folder_error[500] = "";
+				ImGui::InputText("##newfolder", new_folder_name, sizeof(new_folder_name));
 				if (ImGui::Button("Create##1")) {
-					if (strlen(newFolderName) <= 0) {
-						strcpy_s(newFolderError, "Folder name can't be empty");
+					if (strlen(new_folder_name) <= 0) {
+						strcpy_s(new_folder_error, "Folder name can't be empty");
 					}
 					else {
-						std::string newFilePath = fileDialogCurrentPath + (fileDialogCurrentPath.back() == '\\' ? "" : "\\") + newFolderName;
-						std::filesystem::create_directory(newFilePath);
+						std::string new_file_path = file_dialog_current_path + (file_dialog_current_path.back() == '\\' ? "" : "\\") + new_folder_name;
+						std::filesystem::create_directory(new_file_path);
 						ImGui::CloseCurrentPopup();
 					}
 				}
 				ImGui::SameLine();
 				if (ImGui::Button("Cancel##1")) {
-					strcpy_s(newFolderName, "");
-					strcpy_s(newFolderError, "");
+					strcpy_s(new_folder_name, "");
+					strcpy_s(new_folder_error, "");
 					ImGui::CloseCurrentPopup();
 				}
-				ImGui::TextColored(ImColor(1.0f, 0.0f, 0.2f, 1.0f), newFolderError);
+				ImGui::TextColored(ImColor(1.0f, 0.0f, 0.2f, 1.0f), new_folder_error);
 				ImGui::EndPopup();
 			}
 
@@ -268,10 +268,10 @@ namespace FileDialog {
 			if (ImGui::BeginPopup("DeleteFolderPopup", ImGuiWindowFlags_Modal)) {
 				ImGui::TextColored(ImColor(1.0f, 0.0f, 0.2f, 1.0f), "Are you sure you want to delete this folder?");
 				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 6);
-				ImGui::TextUnformatted(fileDialogCurrentFolder.c_str());
+				ImGui::TextUnformatted(file_dialog_current_folder.c_str());
 				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 6);
 				if (ImGui::Button("Yes")) {
-					std::filesystem::remove(fileDialogCurrentPath + (fileDialogCurrentPath.back() == '\\' ? "" : "\\") + fileDialogCurrentFolder);
+					std::filesystem::remove(file_dialog_current_path + (file_dialog_current_path.back() == '\\' ? "" : "\\") + file_dialog_current_folder);
 					ImGui::CloseCurrentPopup();
 				}
 				ImGui::SameLine();
@@ -284,29 +284,29 @@ namespace FileDialog {
 			ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 120);
 
 			if (ImGui::Button("Cancel")) {
-				fileDialogFileSelectIndex = 0;
-				fileDialogFolderSelectIndex = 0;
-				fileDialogCurrentFile = "";
-				fileDialogOpen = false;
+				file_dialog_file_select_index = 0;
+				file_dialog_folder_select_index = 0;
+				file_dialog_current_file = "";
+				file_dialog_open = false;
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("Choose")) {
 				if (type == FileDialogType::SelectFolder) {
-					if (fileDialogCurrentFolder == "") {
-						strcpy_s(fileDialogError, "Error: You must select a folder!");
+					if (file_dialog_current_folder == "") {
+						strcpy_s(file_dialog_error, "Error: You must select a folder!");
 					}
 					else {
-						strcpy(buffer, (fileDialogCurrentPath + (fileDialogCurrentPath.back() == '\\' ? "" : "\\") + fileDialogCurrentFolder).c_str());
-						fileDialogFileSelectIndex = 0;
-						fileDialogFolderSelectIndex = 0;
-						fileDialogCurrentFile = "";
-						fileDialogOpen = false;
+						strcpy(buffer, (file_dialog_current_path + (file_dialog_current_path.back() == '\\' ? "" : "\\") + file_dialog_current_folder).c_str());
+						file_dialog_file_select_index = 0;
+						file_dialog_folder_select_index = 0;
+						file_dialog_current_file = "";
+						file_dialog_open = false;
 					}
 				}
 			}
 
-			if (strlen(fileDialogError) > 0) {
-				ImGui::TextColored(ImColor(1.0f, 0.0f, 0.2f, 1.0f), fileDialogError);
+			if (strlen(file_dialog_error) > 0) {
+				ImGui::TextColored(ImColor(1.0f, 0.0f, 0.2f, 1.0f), file_dialog_error);
 			}
 
 			ImGui::End();
