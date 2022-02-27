@@ -243,7 +243,7 @@ namespace FileDialog {
 				ImGui::Text("Enter a name for the new folder");
 				static char newFolderName[500] = "";
 				static char newFolderError[500] = "";
-				ImGui::InputText("", newFolderName, sizeof(newFolderName));
+				ImGui::InputText("##newfolder", newFolderName, sizeof(newFolderName));
 				if (ImGui::Button("Create##1")) {
 					if (strlen(newFolderName) <= 0) {
 						strcpy_s(newFolderError, "Folder name can't be empty");
