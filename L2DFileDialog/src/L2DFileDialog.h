@@ -308,13 +308,17 @@ namespace FileDialog {
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 120);
 
-			if (ImGui::Button("Cancel")) {
+			static auto reset_everything = [&]() {
 				file_dialog_file_select_index = 0;
 				file_dialog_folder_select_index = 0;
 				file_dialog_current_file = "";
 				strcpy_s(file_dialog_error, "");
 				initial_path_set = false;
 				file_dialog_open = false;
+			};
+
+			if (ImGui::Button("Cancel")) {
+				reset_everything();
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("Choose")) {
@@ -324,13 +328,8 @@ namespace FileDialog {
 					}
 					else {
 						strcpy(buffer, (file_dialog_current_path + (file_dialog_current_path.back() == '\\' ? "" : "\\") + file_dialog_current_folder).c_str());
-						file_dialog_file_select_index = 0;
-						file_dialog_folder_select_index = 0;
-						file_dialog_current_folder = "";
-						file_dialog_current_file = "";
 						strcpy_s(file_dialog_error, "");
-						initial_path_set = false;
-						file_dialog_open = false;
+						reset_everything();
 					}
 				}
 				else if (type == FileDialogType::OpenFile) {
@@ -339,13 +338,8 @@ namespace FileDialog {
 					}
 					else {
 						strcpy(buffer, (file_dialog_current_path + (file_dialog_current_path.back() == '\\' ? "" : "\\") + file_dialog_current_file).c_str());
-						file_dialog_file_select_index = 0;
-						file_dialog_folder_select_index = 0;
-						file_dialog_current_folder = "";
-						file_dialog_current_file = "";
 						strcpy_s(file_dialog_error, "");
-						initial_path_set = false;
-						file_dialog_open = false;
+						reset_everything();
 					}
 				}
 			}
