@@ -99,6 +99,9 @@ int main(int, char**)
                 done = true;
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
                 done = true;
+            if (event.type == SDL_KEYDOWN && event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
+                done = true;
+            }
         }
 
         // Start the Dear ImGui frame
@@ -111,9 +114,12 @@ int main(int, char**)
         static char* file_dialog_buffer = nullptr;
         static char path1[500] = "";
         static char path2[500] = "";
+        static char path3[500] = "";
         ImGui::Begin("L2DFileDialog Test");
         ImGui::Text("Path settings example");
         ImGui::Separator();
+
+        // Choose a folder
         ImGui::TextUnformatted("Test Path 1");
         ImGui::SetNextItemWidth(380);
         ImGui::InputText("##path1", path1, sizeof(path1));
@@ -121,7 +127,10 @@ int main(int, char**)
         if (ImGui::Button("Browse##path1")) {
             file_dialog_buffer = path1;
             FileDialog::file_dialog_open = true;
+            FileDialog::file_dialog_open_type = FileDialog::FileDialogType::SelectFolder;
         }
+
+        // Choose a different folder
         ImGui::TextUnformatted("Test Path 2");
         ImGui::SetNextItemWidth(380);
         ImGui::InputText("##path2", path2, sizeof(path2));
@@ -129,10 +138,22 @@ int main(int, char**)
         if (ImGui::Button("Browse##path2")) {
             file_dialog_buffer = path2;
             FileDialog::file_dialog_open = true;
+            FileDialog::file_dialog_open_type = FileDialog::FileDialogType::SelectFolder;
+        }
+
+        // Choose a file
+        ImGui::TextUnformatted("Choose a file");
+        ImGui::SetNextItemWidth(380);
+        ImGui::InputText("##path3", path3, sizeof(path3));
+        ImGui::SameLine();
+        if (ImGui::Button("Browse##path3")) {
+            file_dialog_buffer = path3;
+            FileDialog::file_dialog_open = true;
+            FileDialog::file_dialog_open_type = FileDialog::FileDialogType::OpenFile;
         }
 
         if (FileDialog::file_dialog_open) {
-            FileDialog::ShowFileDialog(&FileDialog::file_dialog_open, file_dialog_buffer, sizeof(file_dialog_buffer), FileDialog::FileDialogType::SelectFolder);
+            FileDialog::ShowFileDialog(&FileDialog::file_dialog_open, file_dialog_buffer, sizeof(file_dialog_buffer), FileDialog::file_dialog_open_type);
         }
 
         ImGui::End();

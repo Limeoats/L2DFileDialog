@@ -39,6 +39,7 @@ namespace FileDialog {
 	};
 
 	static bool file_dialog_open = false;
+	static FileDialogType file_dialog_open_type = FileDialogType::OpenFile;
 
 	void ShowFileDialog(bool* open, char* buffer, unsigned int buffer_size, FileDialogType type = FileDialogType::OpenFile) {
 		static int file_dialog_file_select_index = 0;
@@ -52,10 +53,34 @@ namespace FileDialog {
 		static FileDialogSortOrder date_sort_order = FileDialogSortOrder::None;
 		static FileDialogSortOrder type_sort_order = FileDialogSortOrder::None;
 
+		static bool initial_path_set = false;
 
 		if (open) {
+			// Check if there was already something in the buffer. If so, try to use that path (if it exists).
+			// If it doesn't exist, just put them into the current path.
+			if (!initial_path_set && strlen(buffer) > 0) {
+				auto path = std::filesystem::path(buffer);
+				if (std::filesystem::is_directory(path)) {
+					file_dialog_current_path = buffer;
+				}
+				else {
+					// Check if this is just a file in a real path. If so, use the real path.
+					// If that still doesn't work, use current path.
+					if (std::filesystem::exists(path)) {
+						// It's a file! Take the path and set it.
+						file_dialog_current_path = path.remove_filename().string();
+					}
+					else {
+						// An invalid path was entered
+						file_dialog_current_path = std::filesystem::current_path().string();
+					}
+				}
+				initial_path_set = true;
+			}
+
 			ImGui::SetNextWindowSize(ImVec2(740.0f, 410.0f));
-			ImGui::Begin("Select a file", nullptr, ImGuiWindowFlags_NoResize);
+			const char* window_title = (type == FileDialogType::OpenFile ? "Select a file" : "Select a folder");
+			ImGui::Begin(window_title, nullptr, ImGuiWindowFlags_NoResize);
 
 			std::vector<std::filesystem::directory_entry> files;
 			std::vector<std::filesystem::directory_entry> folders;
@@ -287,6 +312,8 @@ namespace FileDialog {
 				file_dialog_file_select_index = 0;
 				file_dialog_folder_select_index = 0;
 				file_dialog_current_file = "";
+				strcpy_s(file_dialog_error, "");
+				initial_path_set = false;
 				file_dialog_open = false;
 			}
 			ImGui::SameLine();
@@ -299,7 +326,25 @@ namespace FileDialog {
 						strcpy(buffer, (file_dialog_current_path + (file_dialog_current_path.back() == '\\' ? "" : "\\") + file_dialog_current_folder).c_str());
 						file_dialog_file_select_index = 0;
 						file_dialog_folder_select_index = 0;
+						file_dialog_current_folder = "";
 						file_dialog_current_file = "";
+						strcpy_s(file_dialog_error, "");
+						initial_path_set = false;
+						file_dialog_open = false;
+					}
+				}
+				else if (type == FileDialogType::OpenFile) {
+					if (file_dialog_current_file == "") {
+						strcpy_s(file_dialog_error, "Error: You must select a file!");
+					}
+					else {
+						strcpy(buffer, (file_dialog_current_path + (file_dialog_current_path.back() == '\\' ? "" : "\\") + file_dialog_current_file).c_str());
+						file_dialog_file_select_index = 0;
+						file_dialog_folder_select_index = 0;
+						file_dialog_current_folder = "";
+						file_dialog_current_file = "";
+						strcpy_s(file_dialog_error, "");
+						initial_path_set = false;
 						file_dialog_open = false;
 					}
 				}
