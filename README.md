@@ -15,6 +15,28 @@ Add `L2DFileDialog.h` to your C++ project and include it where you use ImGui. Th
   * Type
   * Last modified date
 
+### Example
+You can see `L2dFileDialog/src/main.cpp` for a full example. Here is a very minimal sample:
+```c++
+...
+static char* file_dialog_buffer = nullptr;
+static char path[500] = "";
+
+ImGui::TextUnformatted("Path: ");
+ImGui::InputText("##path", path, sizeof(path));
+ImGui::SameLine();
+if (ImGui::Button("Browse##path")) {
+  file_dialog_buffer = path;
+  FileDialog::file_dialog_open = true;
+  FileDialog::file_dialog_open_type = FileDialog::FileDialogType::SelectFolder;
+}
+
+if (FileDialog::file_dialog_open) {
+  FileDialog::ShowFileDialog(&FileDialog::file_dialog_open, file_dialog_buffer, sizeof(file_dialog_buffer), FileDialog::file_dialog_open_type);
+}
+...
+```
+
 ![L2DFileDialogGif](/screenshots/choose_folder.gif)
 
 ### License
