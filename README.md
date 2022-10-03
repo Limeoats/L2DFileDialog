@@ -1,6 +1,8 @@
 # Lime2D File Dialog
 A C++ file dialog using Dear ImGui.
 
+<a href='https://ko-fi.com/Q5Q8FGABI' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi2.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+
 ![L2DFileDialog](/screenshots/main_pic.png?raw=true "L2DFileDialog")
 
 ### Usage
