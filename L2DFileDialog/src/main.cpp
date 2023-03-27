@@ -111,7 +111,7 @@ int main(int, char**)
 
 
         // L2DFileDialog code goes here.
-        static char* file_dialog_buffer = nullptr;
+        static char* file_dialog_buffer = new char[500];
         static char path1[500] = "";
         static char path2[500] = "";
         static char path3[500] = "";
