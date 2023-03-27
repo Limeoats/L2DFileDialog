@@ -42,12 +42,6 @@ namespace FileDialog {
 	static bool file_dialog_open = false;
 	static FileDialogType file_dialog_open_type = FileDialogType::OpenFile;
 
-	void ShowFileDialog_s(bool* open, char* buffer, FileDialogType type = FileDialogType::OpenFile)
-	{
-		ShowFileDialog(open, buffer, 500, type);
-	}
-
-
 	void ShowFileDialog(bool* open, char* buffer, unsigned int buffer_size, FileDialogType type = FileDialogType::OpenFile) {
 		static int file_dialog_file_select_index = 0;
 		static int file_dialog_folder_select_index = 0;
@@ -362,6 +356,11 @@ namespace FileDialog {
 
 			ImGui::End();
 		}
+	}
+
+	void ShowFileDialog_s(bool* open, char* buffer, FileDialogType type = FileDialogType::OpenFile)
+	{
+		ShowFileDialog(open, buffer, 500, type);
 	}
 
 }
