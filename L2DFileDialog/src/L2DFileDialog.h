@@ -42,7 +42,7 @@ namespace FileDialog {
 	static bool file_dialog_open = false;
 	static FileDialogType file_dialog_open_type = FileDialogType::OpenFile;
 
-	void ShowFileDialog(bool* open, char* buffer, unsigned int buffer_size, FileDialogType type = FileDialogType::OpenFile) {
+	void ShowFileDialog(bool* open, char* buffer, [[maybe_unused]] unsigned int buffer_size, FileDialogType type = FileDialogType::OpenFile) {
 		static int file_dialog_file_select_index = 0;
 		static int file_dialog_folder_select_index = 0;
 		static std::string file_dialog_current_path = std::filesystem::current_path().string();
