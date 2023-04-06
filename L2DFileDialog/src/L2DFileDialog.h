@@ -21,6 +21,7 @@
 #include <imgui_internal.h>
 #include <chrono>
 #include <string>
+#include <time.h>
 #include <filesystem>
 #include <sstream>
 
@@ -41,7 +42,7 @@ namespace FileDialog {
 	static bool file_dialog_open = false;
 	static FileDialogType file_dialog_open_type = FileDialogType::OpenFile;
 
-	void ShowFileDialog(bool* open, char* buffer, unsigned int buffer_size, FileDialogType type = FileDialogType::OpenFile) {
+	void ShowFileDialog(bool* open, char* buffer, [[maybe_unused]] unsigned int buffer_size, FileDialogType type = FileDialogType::OpenFile) {
 		static int file_dialog_file_select_index = 0;
 		static int file_dialog_folder_select_index = 0;
 		static std::string file_dialog_current_path = std::filesystem::current_path().string();
@@ -228,9 +229,12 @@ namespace FileDialog {
 				auto ftime = files[i].last_write_time();
 				auto st = std::chrono::time_point_cast<std::chrono::system_clock::duration>(ftime - decltype(ftime)::clock::now() + std::chrono::system_clock::now());
 				std::time_t tt = std::chrono::system_clock::to_time_t(st);
-				std::tm* mt = std::localtime(&tt);
+
+				std::tm mt;
+				localtime_s(&mt, &tt);
 				std::stringstream ss;
-				ss << std::put_time(mt, "%F %R");
+				ss << std::put_time(&mt, "%F %R");
+				
 				ImGui::TextUnformatted(ss.str().c_str());
 				ImGui::NextColumn();
 			}
@@ -327,7 +331,8 @@ namespace FileDialog {
 						strcpy_s(file_dialog_error, "Error: You must select a folder!");
 					}
 					else {
-						strcpy(buffer, (file_dialog_current_path + (file_dialog_current_path.back() == '\\' ? "" : "\\") + file_dialog_current_folder).c_str());
+						auto path = file_dialog_current_path + (file_dialog_current_path.back() == '\\' ? "" : "\\") + file_dialog_current_file;
+						strcpy_s(buffer, path.length() + 1, path.c_str());
 						strcpy_s(file_dialog_error, "");
 						reset_everything();
 					}
@@ -337,7 +342,8 @@ namespace FileDialog {
 						strcpy_s(file_dialog_error, "Error: You must select a file!");
 					}
 					else {
-						strcpy(buffer, (file_dialog_current_path + (file_dialog_current_path.back() == '\\' ? "" : "\\") + file_dialog_current_file).c_str());
+						auto path = file_dialog_current_path + (file_dialog_current_path.back() == '\\' ? "" : "\\") + file_dialog_current_file;
+						strcpy_s(buffer, path.length() + 1, path.c_str());
 						strcpy_s(file_dialog_error, "");
 						reset_everything();
 					}
@@ -350,6 +356,11 @@ namespace FileDialog {
 
 			ImGui::End();
 		}
+	}
+
+	void ShowFileDialog_s(bool* open, char* buffer, FileDialogType type = FileDialogType::OpenFile)
+	{
+		ShowFileDialog(open, buffer, 500, type);
 	}
 
 }
