@@ -107,7 +107,7 @@ namespace FileDialog {
 				}
 			}
 			for (int i = 0; i < folders.size(); ++i) {
-				if (ImGui::Selectable(folders[i].path().stem().string().c_str(), i == file_dialog_folder_select_index, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(ImGui::GetWindowContentRegionWidth(), 0))) {
+				if (ImGui::Selectable(folders[i].path().stem().string().c_str(), i == file_dialog_folder_select_index, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
 					file_dialog_current_file = "";
 					if (ImGui::IsMouseDoubleClicked(0)) {
 						file_dialog_current_path = folders[i].path().string();
@@ -216,7 +216,7 @@ namespace FileDialog {
 			}
 
 			for (int i = 0; i < files.size(); ++i) {
-				if (ImGui::Selectable(files[i].path().filename().string().c_str(), i == file_dialog_file_select_index, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(ImGui::GetWindowContentRegionWidth(), 0))) {
+				if (ImGui::Selectable(files[i].path().filename().string().c_str(), i == file_dialog_file_select_index, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
 					file_dialog_file_select_index = i;
 					file_dialog_current_file = files[i].path().filename().string();
 					file_dialog_current_folder = "";
